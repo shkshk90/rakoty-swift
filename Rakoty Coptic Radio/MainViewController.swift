@@ -6,12 +6,19 @@
 //
 
 import UIKit
+import os.log
 
-class ViewController: UIViewController {
+class MainViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        OSLog.rakoda.log(type: .info, "Hello from VC.")
+        
+        view.backgroundColor = .systemOrange
+        navigationItem.title = "Rakoty"
+        
     }
 
 

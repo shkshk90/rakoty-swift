@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import AVKit
+import os.log
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,6 +15,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .moviePlayback,
+                options: [.duckOthers, .mixWithOthers])
+            os_log("Setup of AVAudioSession succedded.",
+                   log: OSLog.rakodaLog,
+                   type: .debug)
+        } catch {
+            os_log("Setup of AVAudioSession Failed.\nError: %@",
+                   log: OSLog.rakodaLog,
+                   type: .error,
+                   error.localizedDescription)
+            
+        }
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+            os_log("AVAudioSession is now set to active.",
+                   log: OSLog.rakodaLog,
+                   type: .debug)
+        } catch {
+            os_log("Failed to set AVAudioSession to active.\nError: %@",
+                   log: OSLog.rakodaLog,
+                   type: .error,
+                   error.localizedDescription)
+        }
         // Override point for customization after application launch.
         
         /*
@@ -42,31 +72,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          */
         
         /* In the other app delegate
-         
-         var window: UIWindow?
-             
-
-             func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-                 // Override point for customization after application launch.
-                 try? AVAudioSession.sharedInstance()
-                     .setCategory(AVAudioSession.Category.playback,
-                                  mode: AVAudioSession.Mode.moviePlayback,
-                                  //options: [.allowAirPlay, .mixWithOthers]
-                                  options: []
-                 )
-                 try? AVAudioSession.sharedInstance().setActive(true)
-                 
-                 guard let ver = Float(UIDevice.current.systemVersion), ver < 13.0  else { return true }
-                 
-                 let window = UIWindow(frame: UIScreen.main.bounds)
-                 window.rootViewController = TabBarViewController()
-                 
-                 self.window = window
-                 window.makeKeyAndVisible()
-                 
-                 
-                 return true
-             }
          
          */
         return true
