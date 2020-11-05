@@ -56,15 +56,31 @@
 		E00AA3F42554659C00C7E5F8 /* Rakoty Coptic Radio */ = {
 			isa = PBXGroup;
 			children = (
+				E00AA40C255467B400C7E5F8 /* Other */,
+				E00AA40B2554679C00C7E5F8 /* Main */,
+			);
+			path = "Rakoty Coptic Radio";
+			sourceTree = "<group>";
+		};
+		E00AA40B2554679C00C7E5F8 /* Main */ = {
+			isa = PBXGroup;
+			children = (
 				E00AA3F52554659C00C7E5F8 /* AppDelegate.swift */,
 				E00AA3F72554659C00C7E5F8 /* SceneDelegate.swift */,
+			);
+			name = Main;
+			sourceTree = "<group>";
+		};
+		E00AA40C255467B400C7E5F8 /* Other */ = {
+			isa = PBXGroup;
+			children = (
 				E00AA3F92554659C00C7E5F8 /* ViewController.swift */,
 				E00AA3FB2554659C00C7E5F8 /* Main.storyboard */,
 				E00AA3FE2554659F00C7E5F8 /* Assets.xcassets */,
 				E00AA4002554659F00C7E5F8 /* LaunchScreen.storyboard */,
 				E00AA4032554659F00C7E5F8 /* Info.plist */,
 			);
-			path = "Rakoty Coptic Radio";
+			name = Other;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -216,13 +232,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OPTIMIZATION_LEVEL = "-Osize";
 			};
 			name = Debug;
 		};
@@ -271,7 +287,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
