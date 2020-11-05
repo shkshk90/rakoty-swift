@@ -16,6 +16,51 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+        
+        /*
+         if (![scene isKindOfClass:[UIWindowScene class]])
+             return;
+         
+         UIWindowScene *const windowScene = (UIWindowScene *)scene;
+         
+         self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
+         /*
+          TODO: REPLACE THE TAB BAR CONTROLLER WITH THE NAVIGATION ONE, AND PASS THE NAVIGATION TO ROOT VC
+          UINavigationController *const audioNavigationController =
+          [[UINavigationController alloc] initWithRootViewController:audioVC];
+          */
+         self.window.rootViewController = [[SBSTabBarViewController alloc] init];
+         
+         [self.window makeKeyAndVisible];
+         
+         os_log_debug(sbs_log_general_g, "Scene delegate will connect to session.");
+         */
+        
+        /* In the other scene delegate
+         #if SBY_USE_OLD_GUI
+                 print("USING SWIFTUI GUI")
+                 let contentView = ContentView()
+
+                 // Use a UIHostingController as window root view controller.
+                 if let windowScene = scene as? UIWindowScene {
+                     let window = UIWindow(windowScene: windowScene)
+                     window.rootViewController =
+                         UIHostingController(rootView: contentView
+                         //.environmentObject(ScheduleData())
+                     )
+                     self.window = window
+                     window.makeKeyAndVisible()
+                 }
+                 #else
+                 guard let windowScene = (scene as? UIWindowScene) else { return }
+         //        print("USING other GUI")
+                 let window = UIWindow(windowScene: windowScene)
+                 window.rootViewController = TabBarViewController()
+                 
+                 self.window = window
+                 window.makeKeyAndVisible()
+                 #endif
+         */
         guard let _ = (scene as? UIWindowScene) else { return }
     }
 
