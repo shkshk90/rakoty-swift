@@ -17,7 +17,7 @@ protocol ViewDelegate: AnyObject {
         _ target: Any?,
         action: Selector,
         for controlEvents: UIControl.Event,
-        id buttonId: UInt32)
+        id buttonId: Int32)
     
     /// Used by the VC to enable or disable landscape constraints
     /// Normally, called from viewWillTransitionToSize(::)

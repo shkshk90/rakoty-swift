@@ -62,6 +62,7 @@
 		E00AA3F42554659C00C7E5F8 /* Rakoty Coptic Radio */ = {
 			isa = PBXGroup;
 			children = (
+				E0B19E212554B55800E400D6 /* Extras */,
 				E025FE1525549678000BEBC5 /* View */,
 				E01DA74C25548EDE00AA9C6D /* View Controllers */,
 				E00AA40C255467B400C7E5F8 /* Other */,
@@ -86,8 +87,6 @@
 				E00AA3FE2554659F00C7E5F8 /* Assets.xcassets */,
 				E00AA4002554659F00C7E5F8 /* LaunchScreen.storyboard */,
 				E00AA4032554659F00C7E5F8 /* Info.plist */,
-				E00AA40D255468B000C7E5F8 /* Additions.swift */,
-				E01DA7472554833700AA9C6D /* ViewDelegate.swift */,
 			);
 			name = Other;
 			sourceTree = "<group>";
@@ -106,6 +105,15 @@
 				E025FE1225549671000BEBC5 /* MainView.swift */,
 			);
 			name = View;
+			sourceTree = "<group>";
+		};
+		E0B19E212554B55800E400D6 /* Extras */ = {
+			isa = PBXGroup;
+			children = (
+				E00AA40D255468B000C7E5F8 /* Additions.swift */,
+				E01DA7472554833700AA9C6D /* ViewDelegate.swift */,
+			);
+			name = Extras;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

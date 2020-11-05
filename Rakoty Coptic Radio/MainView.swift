@@ -8,6 +8,7 @@
 import UIKit
 import AVKit
 import MediaPlayer
+import os.log
 
 final class MainView: UIView, ViewDelegate {
     
@@ -28,8 +29,8 @@ final class MainView: UIView, ViewDelegate {
     private let airplayButton: AVRoutePickerView
     private let volumeSlider: MPVolumeView
     
-    private let portraitConstraints: [NSLayoutConstraint]
-    private let landscapeConstraints: [NSLayoutConstraint]
+    private var portraitConstraints: [NSLayoutConstraint]
+    private var landscapeConstraints: [NSLayoutConstraint]
     
     
     // MARK: - Initializers
@@ -46,7 +47,8 @@ final class MainView: UIView, ViewDelegate {
         airplayButton = AVRoutePickerView()
         volumeSlider = MPVolumeView()
         
-        setupConstraints()
+        portraitConstraints = []
+        landscapeConstraints = []
         
         super.init(frame: frame)
         
@@ -85,7 +87,7 @@ final class MainView: UIView, ViewDelegate {
             subview.translatesAutoresizingMaskIntoConstraints = false
         }
         
-        //[self setupConstraints];
+        setupConstraints()
     }
     
     private func setupConstraints() {
@@ -93,118 +95,119 @@ final class MainView: UIView, ViewDelegate {
         let portraitFrame = UIScreen.screenSize
         let landscapeFrame = CGRect(origin: .zero,
                                     size: CGSize(width: portraitFrame.height, height: portraitFrame.width))
-        let sixteenByNine  = 16.0 / 9.0;
+        let sixteenByNine: CGFloat  = 16.0 / 9.0;
         
         switch (UIDevice.current.userInterfaceIdiom) {
         case .phone:
             portraitConstraints = [
-                mainImage.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                mainImage.widthAnchor.constraint(equalToAnchor: mainImage.heightAnchor, multiplier: sixteenByNine),
-                mainImage.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.9),
-                mainImage.bottomAnchor.constraint(equalToAnchor: guide.centerYAnchor),
+                mainImage.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),
+                mainImage.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.9),
+                mainImage.bottomAnchor.constraint(equalTo: guide.centerYAnchor),
                 
-                playButton.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                playButton.widthAnchor.constraint(equalToAnchor: playButton.heightAnchor),
-                playButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.06),
-                playButton.topAnchor.constraint(equalToAnchor: mainImage.centerYAnchor, constant: portraitFrame.size.height * 0.25),
+                playButton.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                playButton.widthAnchor.constraint(equalTo: playButton.heightAnchor),
+                playButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.06),
+                playButton.topAnchor.constraint(equalTo: mainImage.centerYAnchor, constant: portraitFrame.height * 0.25),
 
-                airplayButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                airplayButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                airplayButton.leftAnchor.constraint(equalToAnchor: volumeSlider.leftAnchor),
-                
-                videoButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                videoButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                videoButton.rightAnchor.constraint(equalToAnchor: volumeSlider.rightAnchor),
+                airplayButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                airplayButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                airplayButton.leftAnchor.constraint(equalTo: volumeSlider.leftAnchor),
 
-                volumeSlider.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                volumeSlider.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.8),
-                volumeSlider.topAnchor.constraint(equalToAnchor: playButton.bottomAnchor, constant: portraitFrame.size.height * 0.07),
-                volumeSlider.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.2)
+                videoButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                videoButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                videoButton.rightAnchor.constraint(equalTo: volumeSlider.rightAnchor),
+
+                volumeSlider.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                volumeSlider.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.8),
+                volumeSlider.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: portraitFrame.height * 0.07),
+                volumeSlider.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.2),
             ]
             landscapeConstraints = [
-                mainImage.rightAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                mainImage.centerYAnchor.constraint(equalToAnchor: guide.centerYAnchor),
-                mainImage.widthAnchor.constraint(equalToAnchor: mainImage.heightAnchor, multiplier: sixteenByNine),
+                mainImage.rightAnchor.constraint(equalTo: guide.centerXAnchor),
+                mainImage.centerYAnchor.constraint(equalTo: guide.centerYAnchor),
+                mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),
                 mainImage.widthAnchor.constraint(equalToConstant: landscapeFrame.size.width * 0.48),
 
-                playButton.centerYAnchor.constraint(equalToAnchor: guide.centerYAnchor),
-                playButton.widthAnchor.constraint(equalToAnchor: playButton.heightAnchor),
+                playButton.centerYAnchor.constraint(equalTo: guide.centerYAnchor),
+                playButton.widthAnchor.constraint(equalTo: playButton.heightAnchor),
                 playButton.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.06),
-                playButton.leftAnchor.constraint(equalToAnchor: guide.centerXAnchor, constant: landscapeFrame.size.width * 0.25),
+                playButton.leftAnchor.constraint(equalTo: guide.centerXAnchor, constant: landscapeFrame.size.width * 0.25),
 
-                airplayButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                airplayButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                airplayButton.leftAnchor.constraint(equalToAnchor: volumeSlider.leftAnchor),
-                
-                videoButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                videoButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                videoButton.rightAnchor.constraint(equalToAnchor: volumeSlider.rightAnchor),
+                airplayButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                airplayButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                airplayButton.leftAnchor.constraint(equalTo: volumeSlider.leftAnchor),
 
-                volumeSlider.centerXAnchor.constraint(equalToAnchor: playButton.centerXAnchor),
-                volumeSlider.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.4),
-                volumeSlider.topAnchor.constraint(equalToAnchor: playButton.bottomAnchor, constant: landscapeFrame.size.height * 0.1),
+                videoButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                videoButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                videoButton.rightAnchor.constraint(equalTo: volumeSlider.rightAnchor),
+
+                volumeSlider.centerXAnchor.constraint(equalTo: playButton.centerXAnchor),
+                volumeSlider.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.4),
+                volumeSlider.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: landscapeFrame.size.height * 0.1),
                 volumeSlider.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.2)
             ]
         case .pad:
             portraitConstraints = [
-                mainImage.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                mainImage.widthAnchor.constraint(equalToAnchor: mainImage.heightAnchor, multiplier: sixteenByNine),
-                mainImage.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.95),
-                mainImage.bottomAnchor.constraint(equalToAnchor: guide.centerYAnchor),
-                
-                playButton.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                playButton.widthAnchor.constraint(equalToAnchor: playButton.heightAnchor),
-                playButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.06),
-                playButton.topAnchor.constraint(equalToAnchor: mainImage.bottomAnchor, constant: portraitFrame.size.height * 0.2),
+                mainImage.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),
+                mainImage.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.95),
+                mainImage.bottomAnchor.constraint(equalTo: guide.centerYAnchor),
 
-                airplayButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                airplayButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                airplayButton.leftAnchor.constraint(equalToAnchor: volumeSlider.leftAnchor),
-                
-                videoButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                videoButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.025),
-                videoButton.rightAnchor.constraint(equalToAnchor: volumeSlider.rightAnchor),
+                playButton.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                playButton.widthAnchor.constraint(equalTo: playButton.heightAnchor),
+                playButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.06),
+                playButton.topAnchor.constraint(equalTo: mainImage.bottomAnchor, constant: portraitFrame.height * 0.2),
 
-                volumeSlider.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                volumeSlider.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.4),
-                volumeSlider.topAnchor.constraint(equalToAnchor: playButton.bottomAnchor, constant: portraitFrame.size.height * 0.07),
-                volumeSlider.heightAnchor.constraint(equalToConstant: portraitFrame.size.height * 0.15)
+                airplayButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                airplayButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                airplayButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                airplayButton.leftAnchor.constraint(equalTo: volumeSlider.leftAnchor),
+
+                videoButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                videoButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                videoButton.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.025),
+                videoButton.rightAnchor.constraint(equalTo: volumeSlider.rightAnchor),
+
+                volumeSlider.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                volumeSlider.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.4),
+                volumeSlider.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: portraitFrame.height * 0.07),
+                volumeSlider.heightAnchor.constraint(equalToConstant: portraitFrame.height * 0.15)
             ]
             landscapeConstraints = [
-                mainImage.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                mainImage.widthAnchor.constraint(equalToAnchor: mainImage.heightAnchor, multiplier: sixteenByNine),
+                mainImage.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),
                 mainImage.widthAnchor.constraint(equalToConstant: landscapeFrame.size.width * 0.8),
-                mainImage.topAnchor.constraint(equalToAnchor: guide.topAnchor, constant: landscapeFrame.size.height * 0.005),
+                mainImage.topAnchor.constraint(equalTo: guide.topAnchor, constant: landscapeFrame.size.height * 0.005),
 
-                playButton.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                playButton.widthAnchor.constraint(equalToAnchor: playButton.heightAnchor),
+                playButton.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                playButton.widthAnchor.constraint(equalTo: playButton.heightAnchor),
                 playButton.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.06),
-                playButton.topAnchor.constraint(equalToAnchor: mainImage.bottomAnchor, constant: landscapeFrame.size.height * 0.05),
+                playButton.topAnchor.constraint(equalTo: mainImage.bottomAnchor, constant: landscapeFrame.size.height * 0.05),
 
-                airplayButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                airplayButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
+                airplayButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                airplayButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
                 airplayButton.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.025),
-                airplayButton.leftAnchor.constraint(equalToAnchor: volumeSlider.leftAnchor),
-                
-                videoButton.centerYAnchor.constraint(equalToAnchor: playButton.centerYAnchor),
-                videoButton.widthAnchor.constraint(equalToAnchor: airplayButton.heightAnchor),
-                videoButton.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.025),
-                videoButton.rightAnchor.constraint(equalToAnchor: volumeSlider.rightAnchor),
+                airplayButton.leftAnchor.constraint(equalTo: volumeSlider.leftAnchor),
 
-                volumeSlider.centerXAnchor.constraint(equalToAnchor: guide.centerXAnchor),
-                volumeSlider.widthAnchor.constraint(equalToAnchor: guide.widthAnchor, multiplier:  0.4),
-                volumeSlider.topAnchor.constraint(equalToAnchor: playButton.bottomAnchor, constant: landscapeFrame.size.height * 0.05),
+                videoButton.centerYAnchor.constraint(equalTo: playButton.centerYAnchor),
+                videoButton.widthAnchor.constraint(equalTo: airplayButton.heightAnchor),
+                videoButton.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.025),
+                videoButton.rightAnchor.constraint(equalTo: volumeSlider.rightAnchor),
+
+                volumeSlider.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
+                volumeSlider.widthAnchor.constraint(equalTo: guide.widthAnchor, multiplier:  0.4),
+                volumeSlider.topAnchor.constraint(equalTo: playButton.bottomAnchor, constant: landscapeFrame.size.height * 0.05),
                 volumeSlider.heightAnchor.constraint(equalToConstant: landscapeFrame.size.height * 0.15)
             ]
         default:
             fatalError("Constraints are not implemented for this device.")
         }
+ 
     }
     
     
@@ -213,9 +216,29 @@ final class MainView: UIView, ViewDelegate {
         _ target: Any?,
         action: Selector,
         for controlEvents: UIControl.Event,
-        id buttonId: UInt32) {}
+        id buttonId: Int32
+    ) {
+        switch (buttonId) {
+        case Ids.playButton.rawValue:
+            playButton.addTarget(target, action: action, for: controlEvents)
+        case Ids.videoButton.rawValue:
+            videoButton.addTarget(target, action: action, for: controlEvents)
+        default:
+            OSLog.rakoda.log(type: .fault, "MainView::Got a wrong ID for button: %ld.", buttonId)
+            break
+        }
+    }
     
-    func activateLandscapeConstraints(_ isLandscape: Bool) {}
+    func activateLandscapeConstraints(_ isLandscape: Bool) {
+        if isLandscape {
+            NSLayoutConstraint.activate(landscapeConstraints)
+            NSLayoutConstraint.deactivate(portraitConstraints)
+        } else {
+            NSLayoutConstraint.activate(portraitConstraints)
+            NSLayoutConstraint.deactivate(landscapeConstraints)
+        }
+    }
+    
     func viewWithTag(_ viewId: Int32) -> UIView? {
         switch (viewId) { 
         case Ids.playButton.rawValue:
