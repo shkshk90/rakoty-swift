@@ -29,7 +29,7 @@ protocol ViewDelegate: AnyObject {
     /// The ID is normally defined as an enum in the view.
     /// - Parameter viewId: ID of the view
     /// - Returns UIView?: a subview if found, nil otherwise
-    func viewWithTag(_ viewId: UInt32) -> UIView?
+    func viewWithTag(_ viewId: Int32) -> UIView?
 }
 
 
