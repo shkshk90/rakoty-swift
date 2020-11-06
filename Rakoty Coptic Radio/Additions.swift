@@ -90,6 +90,30 @@ extension UIImage {
         return result
     }
 }
+
+
+// MARK: - UIApplication Extensions
+extension UIApplication {
+    static func isCurrentInterfaceLandscape() -> Bool {
+        guard let firstWindow = UIApplication.shared.windows.first else {
+            return false
+        }
+        
+        guard let windowScene = firstWindow.windowScene else {
+            return false
+        }
+        
+        switch (windowScene.interfaceOrientation) {
+        case .landscapeLeft: fallthrough
+        case .landscapeRight:
+            return true
+            
+        default:
+            return false
+        }
+    }
+}
+
 /*
  
  
