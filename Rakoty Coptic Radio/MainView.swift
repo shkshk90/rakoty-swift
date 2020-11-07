@@ -103,13 +103,13 @@ final class MainView: UIView, ViewDelegate {
         let sixteenByNine: CGFloat  = 16.0 / 9.0
         let fourByThree: CGFloat = 4.0 / 3.0
         
-        let smallButtonHeight: CGFloat = portraitFrame.height * 0.03
-        let largeButtonHeight: CGFloat = portraitFrame.height * 0.075
-        
-        
         
         switch (UIDevice.current.userInterfaceIdiom) {
         case .phone:
+            
+            let smallButtonHeight: CGFloat = portraitFrame.height * 0.05
+            let largeButtonHeight: CGFloat = portraitFrame.height * 0.08
+            
             portraitConstraints = [
                 mainImage.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
                 mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),
@@ -164,6 +164,10 @@ final class MainView: UIView, ViewDelegate {
                 volumeSlider.heightAnchor.constraint(equalToConstant: landscapeFrame.height * 0.2)
             ]
         case .pad:
+            
+            let smallButtonHeight: CGFloat = portraitFrame.width * 0.04
+            let largeButtonHeight: CGFloat = portraitFrame.height * 0.075
+            
             portraitConstraints = [
                 mainImage.centerXAnchor.constraint(equalTo: guide.centerXAnchor),
                 mainImage.widthAnchor.constraint(equalTo: mainImage.heightAnchor, multiplier: sixteenByNine),

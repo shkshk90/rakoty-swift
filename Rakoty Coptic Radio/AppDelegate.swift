@@ -15,6 +15,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        
+        #warning("TEST HERE IF THIS IS TRUE")
+        application.beginReceivingRemoteControlEvents()
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(
+                .playback,
+                mode: .moviePlayback,
+                options: [] //[.duckOthers, .mixWithOthers]
+            )
+            os_log("Setup of AVAudioSession succedded.",
+                   log: OSLog.rakodaLog,
+                   type: .debug)
+        } catch {
+            os_log("Setup of AVAudioSession Failed.\nError: %@",
+                   log: OSLog.rakodaLog,
+                   type: .error,
+                   error.localizedDescription)
+            
+        }
+        do {
+            try AVAudioSession.sharedInstance().setActive(true)
+            os_log("AVAudioSession is now set to active.",
+                   log: OSLog.rakodaLog,
+                   type: .debug)
+        } catch {
+            os_log("Failed to set AVAudioSession to active.\nError: %@",
+                   log: OSLog.rakodaLog,
+                   type: .error,
+                   error.localizedDescription)
+        }
+        
         return true
     }
 
@@ -31,7 +63,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // If any sessions were discarded while the application was not running, this will be called shortly after application:didFinishLaunchingWithOptions.
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
-
-
+    
 }
 

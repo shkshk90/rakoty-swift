@@ -10,7 +10,7 @@ import AVKit
 import MediaPlayer
 import os.log
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, AVPlayerViewControllerDelegate {
 
     // MARK: - Members
     
@@ -38,14 +38,21 @@ class MainViewController: UIViewController {
     private var audioPlayer: AVPlayer?   = nil
     
     private weak var playButton: UIButton?  = nil
-    private var currentImageIndex: Int32 = 3
+    private var currentImageIndex: Int32 = 0
     private var timer: DispatchSourceTimer? = nil
+    
+    private var churchImages: ContiguousArray<UIImage> = []
+    private let churchImageTransition = CATransition()
+    
+    private var videoVC: AVPlayerViewController? = nil
+    private var isPlayingVideo = false
     
     
     
     // MARK: - Constants
     
     private static let rakotyAudioUrl = "http://sc-e1.streamcyclone.com:1935/rakoty_live/rakotyaudio/playlist.m3u8"
+    private static let rakotyVideoUrl = "http://sc-e1.streamcyclone.com/rakoty_live/rakoty/playlist.m3u8"
     
     
     // MARK: - View Cycle Methods
@@ -54,6 +61,31 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         
         OSLog.rakoda.log(type: .debug, "MainViewController::Entered did load.")
+        
+        // ---------------------------------------------------------------------
+        // CREATE IMAGES ON OTHER THREAD
+        // ---------------------------------------------------------------------
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let strongSelf = self else {
+                OSLog.rakoda.log(type: .fault, "MainViewController::DQ::self is nil.")
+                return
+            }
+            
+            
+            strongSelf.churchImageTransition.duration = 1.0
+            strongSelf.churchImageTransition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            strongSelf.churchImageTransition.type = .fade
+            
+            
+            for i in 1... {
+                guard let image = UIImage(named:"church-\(i)") else {
+                    OSLog.rakoda.log(type: .debug, "MainViewController::DQ::i reached %@.", i)
+                    return
+                }
+                
+                strongSelf.churchImages.append(image.roundedImage())
+            }
+        }
         
         // ---------------------------------------------------------------------
         // GENERAL SETUP
@@ -105,6 +137,16 @@ class MainViewController: UIViewController {
             OSLog.rakoda.log(type: .fault, "MainViewController::Failed to create audio streaming url for rakoty.")
         }
         
+        if let rakotyUrl2 = URL(string: MainViewController.rakotyVideoUrl) {
+            let player = AVPlayer(url: rakotyUrl2)
+            
+            videoVC = AVPlayerViewController()
+            videoVC!.player = player
+            videoVC!.delegate = self
+        } else {
+            OSLog.rakoda.log(type: .fault, "MainViewController::Failed to create video streaming url for rakoty.")
+        }
+        
         setupRemoteCommandCenter()
         
         OSLog.rakoda.log(type: .debug, "MainViewController::viewDidLoad() is done.")
@@ -113,6 +155,7 @@ class MainViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         if let timer = timer {
             if !timer.isCancelled {
                 timer.cancel()
@@ -121,17 +164,16 @@ class MainViewController: UIViewController {
             self.timer = nil
         }
         
-        timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.main)
+        timer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global(qos: .background))
         
         //OSLog.rakoda.log(type: .debug, "MainViewController::ViewWillAppear::Start.")
         
 //        timer?.schedule(wallDeadline: DispatchWallTime.now() + .seconds(5),
 //                        repeating: .seconds(5), leeway: .seconds(1))
+        
 
-        #if DEBUG
         timer?.setRegistrationHandler() { OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::from register handler.") }
         timer?.setCancelHandler() { OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::from cancellation handler.") }
-        #endif
         
         timer?.schedule(wallDeadline: DispatchWallTime.now() + .seconds(15),
                         repeating: .seconds(20), leeway: .seconds(1))
@@ -143,6 +185,11 @@ class MainViewController: UIViewController {
             
             guard let strongSelf = self else {
                 OSLog.rakoda.log(type: .fault, "MainViewController::TimerEventHandler::self is nil.")
+                return
+            }
+            
+            if strongSelf.churchImages.isEmpty {
+                OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::No church images were found.")
                 return
             }
             
@@ -159,6 +206,42 @@ class MainViewController: UIViewController {
                 return
             }
             
+            let churchImagesCount = strongSelf.churchImages.count
+            let newIndex = strongSelf.currentImageIndex + 1
+            
+            strongSelf.currentImageIndex =
+                newIndex >= churchImagesCount ? 0 : newIndex
+            
+            let images = strongSelf.churchImages
+            let i = Int(strongSelf.currentImageIndex)
+            let transition = strongSelf.churchImageTransition
+            
+            //OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::Before DQ.")
+            DispatchQueue.main.sync { [weak imageView,
+                                       weak transition,
+                                       weak strongSelf] in
+                //OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::DQ::From DQ.")
+                
+                guard let imageView = imageView,
+                      let transition = transition,
+                      let isPlayingVideo = strongSelf?.isPlayingVideo
+                      else {
+                    OSLog.rakoda.log(type: .fault, "MainViewController::TimerEventHandler::DQ::imageView or transition or self is nil.")
+                    
+                    return
+                }
+                
+                if isPlayingVideo {
+                    OSLog.rakoda.log(type: .fault,
+                                     "MainViewController::TimerEventHandler::DQ::isPlayingVideo is true.")
+                    return
+                }
+                
+                imageView.image = images[i]
+                imageView.layer.add(transition, forKey:nil)
+            }
+            //OSLog.rakoda.log(type: .debug, "MainViewController::TimerEventHandler::After DQ.")
+            /*
             var nullableNewImage = UIImage(named: "church-\(strongSelf.currentImageIndex)")
             if nullableNewImage == nil {
                 strongSelf.currentImageIndex = 1
@@ -182,11 +265,10 @@ class MainViewController: UIViewController {
             transition.type = .fade;
 
             imageView.layer.add(transition, forKey:nil)
+            */
         }
         
         OSLog.rakoda.log(type: .debug, "MainViewController::ViewWillAppear::End.")
-        
-        
         
         /*
          self.currentImageIndex = 3;
@@ -247,11 +329,19 @@ class MainViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+        OSLog.rakoda.log(type: .debug, "MainViewController::viewDidAppear::Called.")
+        
+        currentImageIndex = 0
+        isPlayingVideo = false
+        
         timer?.resume()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        OSLog.rakoda.log(type: .debug, "MainViewController::viewWillDisappear::Called.")
         
         timer?.cancel()
         timer = nil
@@ -259,6 +349,9 @@ class MainViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to:size, with: coordinator)
+        
+        OSLog.rakoda.log(type: .debug, "MainViewController::viewWillTransition::Called.")
+        
         mainView?.activateLandscapeConstraints(size.width > size.height)
     }
     
@@ -282,6 +375,16 @@ class MainViewController: UIViewController {
     }
     @objc func videoButtonPressed() {
         OSLog.rakoda.log(type: .debug, "MainViewController::videoButtonPressed::Pressed.")
+        guard let videoVC = videoVC else {
+            OSLog.rakoda.log(type: .fault, "MainViewController::videoButtonPressed::videoVC is nil.")
+            return
+        }
+        
+        present(videoVC,
+                animated: true) { [weak self] in
+            self?.isPlayingVideo = true
+            OSLog.rakoda.log(type: .fault, "MainViewController::videoVC::videoVC presented.")
+        }
     }
     
     
@@ -313,6 +416,7 @@ class MainViewController: UIViewController {
         commandCenter.playCommand.addTarget(self, action: #selector(handleMediaPlayerCommand(_:)))
         commandCenter.pauseCommand.addTarget(self, action: #selector(handleMediaPlayerCommand(_:)))
         
+        /*
         UIApplication.shared.beginReceivingRemoteControlEvents()
         
         do {
@@ -342,6 +446,7 @@ class MainViewController: UIViewController {
                    type: .error,
                    error.localizedDescription)
         }
+        */
         
         setupNowPlaying()
     }
@@ -368,5 +473,8 @@ class MainViewController: UIViewController {
         
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
+    
+    
+    // MARK: - AVPlayerViewControllerDelegate Method
 }
 
