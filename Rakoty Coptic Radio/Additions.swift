@@ -68,7 +68,7 @@ extension UIViewController {
 }
 
 
-// MARK: - UIImage Extensions
+// MARK: - UIImage Extensions 
 extension UIImage {
     /// Returns an image with rounded corners, better for Performance than clipoToBounds()
     /// - Parameter cornerRadius: The radius of the corner of the image

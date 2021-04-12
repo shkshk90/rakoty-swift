@@ -15,7 +15,7 @@
 		E00AA4022554659F00C7E5F8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E00AA4002554659F00C7E5F8 /* LaunchScreen.storyboard */; };
 		E00AA40E255468B000C7E5F8 /* Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E00AA40D255468B000C7E5F8 /* Additions.swift */; };
 		E01DA7482554833700AA9C6D /* ViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E01DA7472554833700AA9C6D /* ViewDelegate.swift */; };
-		E025FE1325549671000BEBC5 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E025FE1225549671000BEBC5 /* MainView.swift */; };
+		E025FE1325549671000BEBC5 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E025FE1225549671000BEBC5 /* MainView.swift */; settings = {COMPILER_FLAGS = "-Wno-deprecated-declarations -Wno-deprecated -Wno-availability"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
